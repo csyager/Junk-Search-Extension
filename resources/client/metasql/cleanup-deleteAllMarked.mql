@@ -1,0 +1,14 @@
+-- Group: cleanup
+-- Name:  deleteAllMarked
+-- Notes: meta-SQL file to remove all contacts stored in the marked_for_followup table
+DELETE FROM marked_for_followup
+ WHERE CAST(cntct_created AS DATE) BETWEEN <? value("startDate") ?> AND <? value("endDate") ?>
+    <? if exists("pattern") ?>
+         AND cntct_email ~* <? value("pattern") ?>
+    <? endif ?>
+    <? if exists("owner") ?>
+         AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
+    <? endif ?>
+    <? if exists("ownerless") ?>
+        OR cntct_owner_username = ''
+    <? endif ?>;

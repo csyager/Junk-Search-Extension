@@ -1,0 +1,43 @@
+-- Group: cleanup
+-- Name:  markAllForReview
+-- Notes: Moves junkSearch query from cntct to marked for review table
+
+INSERT INTO marked_for_followup
+SELECT
+cntct_id,
+cntct_crmacct_id,
+cntct_addr_id,
+cntct_first_name,
+cntct_last_name,
+cntct_honorific,
+cntct_initials,
+cntct_active,
+cntct_phone,
+cntct_phone2,
+cntct_fax,
+cntct_email,
+cntct_webaddr,
+cntct_notes,
+cntct_title,
+cntct_number,
+cntct_middle,
+cntct_suffix,
+cntct_owner_username,
+cntct_name,
+obj_uuid,
+cntct_created,
+cntct_lastupdated
+  FROM cntct
+ WHERE CAST(cntct_created AS DATE) BETWEEN <? value("startDate") ?> AND <? value("endDate") ?>
+    AND cntct_id NOT IN (SELECT cntct_id FROM marked_for_followup)
+    <? if exists("pattern") ?>
+         AND cntct_email ~* <? value("pattern") ?>
+    <? endif ?>
+    <? if exists("owner") ?>
+         AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
+    <? endif ?>
+    <? if exists("ownerless") ?>
+        OR cntct_owner_username = ''
+    <? endif ?>;
+
+

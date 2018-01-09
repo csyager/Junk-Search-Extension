@@ -1,0 +1,7 @@
+-- Group: cleanup
+-- Name:  deleteSelectedMarked
+-- Notes: Removes selected contacts from the marked_for_followup table.
+
+DELETE FROM marked_for_followup
+ WHERE cntct_id = <? value ("id") ?>;
+

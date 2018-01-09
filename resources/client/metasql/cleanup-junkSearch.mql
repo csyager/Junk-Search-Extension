@@ -1,0 +1,28 @@
+-- Group: cleanup
+-- Name:  junkSearch
+-- Notes: Used by junkSearch screen, this query finds junk contacts based on search parameters set in the junkSearch screen
+
+SELECT
+cntct_id,
+cntct_first_name,
+cntct_last_name,
+cntct_active,
+cntct_email,
+cntct_owner_username,
+cntct_created
+  FROM cntct
+ WHERE CAST(cntct_created AS DATE) BETWEEN <? value("startDate") ?> AND <? value("endDate") ?>
+    <? if exists("pattern") ?>
+         AND cntct_email ~* <? value("pattern") ?>
+    <? endif ?>
+    -- Filters based on the pattern if it is provided
+     <? if exists("owner") ?>
+         AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
+    <? endif ?>
+    <? if exists("ownerless") ?>
+        OR cntct_owner_username = ''
+    <? endif ?>
+    
+     
+     -- Filters based on the owner if it is provided
+ORDER BY cntct_first_name, cntct_last_name; 

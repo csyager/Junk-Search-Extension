@@ -1,0 +1,95 @@
+-- Group: cleanup
+-- Name:  deleteAll
+-- Notes: meta-SQL file to delete all cntcts specified by search criteria from cntct table.
+
+-- Moves relavent information into temp_junk table if contacts satisfy search conditions
+INSERT INTO temp_junk (cntct_crmacct_id, cntct_owner_username, cntct_email, cntct_id, cntct_addr_id, cntct_first_name, cntct_last_name, cntct_honorific, cntct_initials, cntct_active, cntct_phone, cntct_phone2, cntct_fax, cntct_webaddr, cntct_notes, cntct_title, cntct_number, cntct_middle, cntct_suffix, cntct_name, obj_uuid, cntct_created, cntct_lastupdated)
+SELECT
+cntct_crmacct_id,
+cntct_owner_username,
+cntct_email,
+cntct_id,
+cntct_addr_id,
+cntct_first_name,
+cntct_last_name,
+cntct_honorific,
+cntct_initials,
+cntct_active,
+cntct_phone,
+cntct_phone2,
+cntct_fax,
+cntct_webaddr,
+cntct_notes,
+cntct_title,
+cntct_number,
+cntct_middle,
+cntct_suffix,
+cntct_name,
+obj_uuid,
+cntct_created,
+cntct_lastupdated
+FROM cntct
+ WHERE
+    CAST(cntct_created AS DATE) BETWEEN <? value("startDate") ?> AND <? value("endDate") ?>
+    AND cntct_id NOT IN (SELECT cntct_id FROM marked_for_followup)
+    <? if exists("pattern") ?>
+         AND cntct_email ~* <? value("pattern") ?>
+    <? endif ?>
+     <? if exists("owner") ?>
+         AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
+     <? endif ?>
+     <? if exists("ownerless") ?>
+        OR cntct_owner_username = ''
+    <? endif ?>;
+
+--Sets cntct_id fields in crmacct to NULL if crmacct_id is found in temp_junk table, which should bypass key constraints
+UPDATE crmacct
+SET crmacct_cntct_id_1 = NULL
+WHERE crmacct_id IN (SELECT cntct_crmacct_id FROM temp_junk);
+
+UPDATE crmacct
+SET crmacct_cntct_id_2 = NULL
+WHERE crmacct_id IN (SELECT cntct_crmacct_id FROM temp_junk);
+
+--Sets crmacct_id field in incdt to NULL if cntct_id is found in temp_junk table, which should bypass key constraints
+UPDATE incdt
+SET incdt_crmacct_id = NULL
+WHERE incdt_crmacct_id IN (SELECT cntct_crmacct_id FROM temp_junk);
+
+--Sets cntct_id field in incdt to NULL if cntct_id is found in temp_junk table, which should bypass key constraints
+UPDATE incdt
+SET incdt_cntct_id = NULL
+WHERE incdt_cntct_id IN (SELECT cntct_id FROM temp_junk);
+
+--Sets cntct_id field in custinfo to NULL if cntct_id is found in temp_junk table, which should bypass key
+UPDATE custinfo
+SET cust_cntct_id = NULL
+WHERE cust_cntct_id IN (SELECT cntct_id FROM temp_junk);
+
+UPDATE custinfo
+SET cust_corrcntct_id = NULL
+WHERE cust_corrcntct_id IN (SELECT cntct_id FROM temp_junk);
+
+--Sets cntct_id field in prj to NULL if cntct_id is found in temp_junk table, which should bypass key
+UPDATE prj
+SET prj_cntct_id = NULL
+WHERE prj_cntct_id IN (SELECT cntct_id FROM temp_junk);
+
+--Sets ophead_cntct_id field in ophead to NULL if cntct_id is found in temp_junk table, which should bypass key
+UPDATE ophead
+SET ophead_cntct_id = NULL
+WHERE ophead_cntct_id IN (SELECT cntct_id FROM temp_junk);
+
+--Removes contacts from cntct table, which should work normally if all key constraints are satisfied
+DELETE FROM cntct
+WHERE CAST(cntct_created AS DATE) BETWEEN <? value("startDate") ?> AND <? value("endDate") ?>
+    AND cntct_id NOT IN (SELECT cntct_id FROM marked_for_followup)
+    <? if exists("pattern") ?>
+         AND cntct_email ~* <? value("pattern") ?>
+    <? endif ?>
+    <? if exists("owner") ?>
+         AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
+    <? endif ?>
+    <? if exists("ownerless") ?>
+        OR cntct_owner_username = ''
+    <? endif ?>

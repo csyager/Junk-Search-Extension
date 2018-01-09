@@ -1,0 +1,5 @@
+-- Group: cleanup
+-- Name:  finalize
+-- Notes: Deletes all contacts from temp_junk folder
+
+DELETE FROM temp_junk
