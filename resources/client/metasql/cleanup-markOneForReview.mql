@@ -28,4 +28,4 @@ obj_uuid,
 cntct_created,
 cntct_lastupdated
   FROM cntct
- WHERE cntct_id = <? value ("id") ?>
+ WHERE cntct_id = <? value ("id") ?>;

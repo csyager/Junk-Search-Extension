@@ -16,12 +16,17 @@ cntct_created
          AND cntct_email ~* <? value("pattern") ?>
     <? endif ?>
     -- Filters based on the pattern if it is provided
-     <? if exists("owner") ?>
-         AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
+   <? if exists("owner") ?>
+        AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
     <? endif ?>
     <? if exists("ownerless") ?>
-        OR cntct_owner_username = ''
+        OR (cntct_owner_username = ''
+	<? if exists("pattern") ?>
+	  AND cntct_email ~* <? value("pattern") ?>
+	<? endif ?>)
     <? endif ?>
+
+    
     
      
      -- Filters based on the owner if it is provided

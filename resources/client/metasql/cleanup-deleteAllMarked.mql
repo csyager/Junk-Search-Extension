@@ -10,5 +10,8 @@ DELETE FROM marked_for_followup
          AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
     <? endif ?>
     <? if exists("ownerless") ?>
-        OR cntct_owner_username = ''
+        OR (cntct_owner_username = ''
+	<? if exists("pattern") ?>
+	  AND cntct_email ~* <? value("pattern") ?>
+	<? endif ?>)
     <? endif ?>;

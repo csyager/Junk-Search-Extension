@@ -35,11 +35,14 @@ FROM cntct
     <? if exists("pattern") ?>
          AND cntct_email ~* <? value("pattern") ?>
     <? endif ?>
-     <? if exists("owner") ?>
+    <? if exists("owner") ?>
          AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
-     <? endif ?>
-     <? if exists("ownerless") ?>
-        OR cntct_owner_username = ''
+    <? endif ?>
+    <? if exists("ownerless") ?>
+        OR (cntct_owner_username = ''
+	<? if exists("pattern") ?>
+	  AND cntct_email ~* <? value("pattern") ?>
+	<? endif ?>)
     <? endif ?>;
 
 --Sets cntct_id fields in crmacct to NULL if crmacct_id is found in temp_junk table, which should bypass key constraints
