@@ -21,6 +21,9 @@ cntct_created
     <? endif ?>
      -- Filters based on the owner if it is provided
     <? if exists("ownerless") ?>
-        OR cntct_owner_username = ''
+        OR (cntct_owner_username = ''
+	<? if exists("pattern") ?>
+	  AND cntct_email ~* <? value("pattern") ?>
+	<? endif ?>)
     <? endif ?>
 ORDER BY cntct_first_name, cntct_last_name; 
