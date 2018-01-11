@@ -19,9 +19,6 @@ _ownerless.setChecked(false);
 var checked = false;
 print(checked);
 
-_dates.setStartNull(qsTr("Earliest"), mainwindow.startOfTime(), true);
-_dates.setEndNull(qsTr("Latest"),     mainwindow.endOfTime(),   true);
-
 _close.clicked.connect(mywindow.close);
 _query.clicked.connect(query);
 _markAllForReview.clicked.connect(reviewAll);
@@ -37,9 +34,7 @@ function toggle() {
   else { checked = true}
   print(checked);
 }
-
-
-
+  
 list.addColumn("Contact ID",               75, 1, true, "cntct_id");
 list.addColumn("First Name",              115, 1, true, "cntct_first_name");
 list.addColumn("Last Name",           90, 1, true, "cntct_last_name");
@@ -51,16 +46,22 @@ list.addColumn("Date Created",         40, 3, true, "cntct_created");
 function getParams() {
 try {
   var params = new Object;
-  params.startDate = _dates.startDate;
-  params.endDate = _dates.endDate;
-  if (checked) {
-    params.ownerless = "true";
+  if (_dates.startDate != "Invalid Date"){
+    params.startDate = _dates.startDate;
+  }
+  if (_dates.endDate != "Invalid Date") {
+    params.endDate = _dates.endDate;
+  }
+  if (!checked) {
+    params.ownerless = "false";
   }
   if (_empCluster.id() > 0){
     params.owner = _empCluster.number;
   }
   print("params.ownerless = " + params.ownerless);
   print("params.owner = " + params.owner);
+  print("params.startDate = " + params.startDate);
+  print("params.endDate = " + params.endDate);
   print(_empCluster.id());
   params.pattern = _searchMe.text;
   return params;
