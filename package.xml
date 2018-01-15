@@ -1,0 +1,23 @@
+<package id      = "junk_search"
+         name    = "junk_search"
+         developer = "Connor Yager"
+         descrip   = "Tools to clean up CRM junk"
+         version   = "1.0.0-alpha" >
+
+  <loadappscript file="client/scripts/junkSearch.js" name="junkSearch" />
+  <loadappui     file="client/uiforms/junkSearch.ui" />
+
+  <loadmetasql file="client/metasql/cleanup-queryMarked.mql"          />
+  <loadmetasql file="client/metasql/cleanup-finalize.mql"             />
+  <loadmetasql file="client/metasql/cleanup-deleteSelected.mql"       />
+  <loadmetasql file="client/metasql/cleanup-deleteAll.mql"            />
+  <loadmetasql file="client/metasql/cleanup-junkSearch.mql"           />
+  <loadmetasql file="client/metasql/cleanup-markAllForReview.mql"     />
+  <loadmetasql file="client/metasql/cleanup-deleteSelectedMarked.mql" />
+  <loadmetasql file="client/metasql/cleanup-deleteAllMarked.mql"      />
+  <loadmetasql file="client/metasql/cleanup-markOneForReview.mql"     />
+
+  <createtable file="database/tables/temp_junk.sql"           name="temp_junk" />
+  <createtable file="database/tables/marked_for_followup.sql" name="marked_for_followup" />
+
+</package>
