@@ -92,14 +92,25 @@ WHERE ophead_cntct_id IN (SELECT cntct_id FROM temp_junk);
 
 --Removes contacts from cntct table, which should work normally if all key constraints are satisfied
 DELETE FROM cntct
-WHERE CAST(cntct_created AS DATE) BETWEEN <? value("startDate") ?> AND <? value("endDate") ?>
-    AND cntct_id NOT IN (SELECT cntct_id FROM marked_for_followup)
+WHERE TRUE
+    <? if exists("startDate") ?>
+      AND CAST(cntct_created AS DATE) > <? value("startDate") ?>
+    <? endif ?>
+    <? if exists("endDate") ?>
+      AND CAST(cntct_created AS DATE) < <? value("endDate") ?>
+    <? endif ?>
+    <? if not exists("startDate") ?>
+      <? if not exists("endDate") ?>
+        AND (cntct_created IS NULL OR cntct_created IS NOT NULL)
+      <? endif ?>
+    <? endif ?>
     <? if exists("pattern") ?>
          AND cntct_email ~* <? value("pattern") ?>
     <? endif ?>
+    -- Filters based on the pattern if it is provided
     <? if exists("owner") ?>
-         AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
+        AND UPPER(cntct_owner_username) = UPPER(<? value("owner") ?>)
     <? endif ?>
     <? if exists("ownerless") ?>
-        OR cntct_owner_username = ''
-    <? endif ?>
+        AND (cntct_owner_username != '' AND cntct_owner_username IS NOT NULL)
+    <? endif ?>;
